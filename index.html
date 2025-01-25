@@ -149,8 +149,13 @@
                 const javaOnline = javaData.online ? "Online" : "Offline";
 
                 // Handle server icon if available
-                const serverIcon = javaData.icon ? javaData.icon : "https://example.com/default-server-icon.png";
+                const serverIcon = javaData.icon ? javaData.icon : "https://vectorified.com/images/mc-server-icon-33.png";
 
+                let link = document.createElement('link');
+link.rel = 'icon';
+link.href = serverIcon; // Replace with your favicon path
+document.head.appendChild(link);
+                
                 statusDiv.innerHTML = `
                     <img src="${serverIcon}" alt="Server Icon" class="server-icon">
                     <p><strong>Bedrock Server:</strong> <span class="status-${bedrockOnline.toLowerCase()}">${bedrockOnline}</span></p>
