@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GodX Network - Minecraft Server</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3a8a, #0f172a);
+            color: #f8fafc;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .card {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .status-online {
+            color: #22c55e;
+            font-weight: bold;
+            animation: fadeIn 1s ease;
+        }
+
+        .status-offline {
+            color: #ef4444;
+            font-weight: bold;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        h1 {
+            font-size: 3rem;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 1.1rem;
+        }
+
+        .player-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .player-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        .player-card:hover {
+            transform: translateY(-5px);
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        footer {
+            background: #1e293b;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 1rem;
+            color: #a5b4fc;
+        }
+
+        .server-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <header class="text-center py-10">
+        <h1>Welcome to GodX Network</h1>
+        <p class="mt-2 text-lg font-medium">Cross-Play Supported Minecraft Server</p>
+        <p class="mt-1 text-sm">IP: <span class="font-bold">play.godxnetwork.ua.kg</span></p>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-4">
+        <section class="mb-8">
+            <h2 class="text-center text-3xl font-semibold mb-4">Live Server Status</h2>
+            <div id="server-status" class="card">
+                <p>Loading server information...</p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-center text-3xl font-semibold mb-4">Currently Online Players</h2>
+            <div id="player-list" class="player-list">
+                <div class="player-card">Loading player information...</div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 GodX Network. All rights reserved.</p>
+    </footer>
+
+    <script>
+        async function fetchServerStatus() {
+            const bedrockApi = "https://api.mcstatus.io/v2/status/bedrock/play.godxnetwork.ua.kg:25566";
+            const javaApi = "https://api.mcstatus.io/v2/status/java/play.godxnetwork.ua.kg";
+
+            try {
+                const [bedrockRes, javaRes] = await Promise.all([
+                    fetch(bedrockApi),
+                    fetch(javaApi)
+                ]);
+
+                const bedrockData = await bedrockRes.json();
+                const javaData = await javaRes.json();
+
+                const statusDiv = document.getElementById("server-status");
+                const bedrockOnline = bedrockData.online ? "Online" : "Offline";
+                const javaOnline = javaData.online ? "Online" : "Offline";
+
+                // Handle server icon if available
+                const serverIcon = javaData.icon ? javaData.icon : "https://example.com/default-server-icon.png";
+
+                statusDiv.innerHTML = `
+                    <img src="${serverIcon}" alt="Server Icon" class="server-icon">
+                    <p><strong>Bedrock Server:</strong> <span class="status-${bedrockOnline.toLowerCase()}">${bedrockOnline}</span></p>
+                    <p><strong>Java Server:</strong> <span class="status-${javaOnline.toLowerCase()}">${javaOnline}</span></p>
+                    <p><strong>Bedrock Players:</strong> ${bedrockData.players.online || 0} / ${bedrockData.players.max}</p>
+                    <p><strong>Java Players:</strong> ${javaData.players.online || 0} / ${javaData.players.max}</p>
+                `;
+
+                const playerListDiv = document.getElementById("player-list");
+                const bedrockPlayers = bedrockData.players?.list || [];
+                const javaPlayers = javaData.players?.list || [];
+
+                const players = [...bedrockPlayers, ...javaPlayers];
+                if (players.length === 0) {
+                    playerListDiv.innerHTML = "<p>No players online at the moment.</p>";
+                } else {
+                    playerListDiv.innerHTML = players.slice(0, 10)
+                        .map((player) => `<div class="player-card">${player.name}</div>`)
+                        .join("");
+                }
+            } catch (error) {
+                console.error("Error fetching server data:", error);
+                document.getElementById("server-status").innerHTML = "<p>Error fetching server status.</p>";
+                document.getElementById("player-list").innerHTML = "<p>Error fetching player information.</p>";
+            }
+        }
+
+        fetchServerStatus();
+        setInterval(fetchServerStatus, 10000); // Refresh every 10 seconds
+    </script>
+</body>
+
+</html>
