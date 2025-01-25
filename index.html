@@ -159,8 +159,8 @@ document.head.appendChild(link);
                 
                 statusDiv.innerHTML = `
                     <img src="${serverIcon}" alt="Server Icon" class="server-icon">
-                    <p><strong>Bedrock Server:</strong> <span class="status-${bedrockOnline.toLowerCase()}">${bedrockOnline}</span></p>
-                    <p><strong>Java Server:</strong> <span class="status-${javaOnline.toLowerCase()}">${javaOnline}</span></p>
+                    <p><strong>Bedrock Server:</strong> <span class="status-${bedrockOnline?.toLowerCase()}">${bedrockOnline}</span></p>
+                    <p><strong>Java Server:</strong> <span class="status-${javaOnline?.toLowerCase()}">${javaOnline}</span></p>
                     <p><strong>Bedrock Players:</strong> ${bedrockData.players.online || 0} / ${bedrockData.players.max}</p>
                     <p><strong>Java Players:</strong> ${javaData.players.online || 0} / ${javaData.players.max}</p>
                 `;
