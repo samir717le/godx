@@ -133,7 +133,7 @@
 
     <script>
         async function fetchServerStatus() {
-            const bedrockApi = "https://api.mcstatus.io/v2/status/bedrock/play.godxnetwork.us.kg:25566";
+            const bedrockApi = "https://api.mcstatus.io/v2/status/bedrock/play.godxnetwork.us.kg:10474";
             const javaApi = "https://api.mcstatus.io/v2/status/java/play.godxnetwork.us.kg";
 
             try {
@@ -146,8 +146,8 @@
                 const javaData = await javaRes.json();
 
                 const statusDiv = document.getElementById("server-status");
-                const bedrockOnline = bedrockData.online ? "Online" : "Offline";
-                const javaOnline = javaData.online ? "Online" : "Offline";
+                const bedrockOnline = await bedrockData.online ? "Online" : "Offline";
+                const javaOnline = await javaData.online ? "Online" : "Offline";
 
                 // Handle server icon if available
                 const serverIcon = javaData.icon ? javaData.icon : "https://vectorified.com/images/mc-server-icon-33.png";
@@ -178,7 +178,7 @@ document.head.appendChild(link);
                         .join("");
                 }
             } catch (error) {
-                console.error("Error fetching server data:", error);
+                document.getElementById("server-status").innerHTML("Error fetching server data:", error);
                 document.getElementById("server-status").innerHTML = "<p>Error fetching server status.</p>";
                 document.getElementById("player-list").innerHTML = "<p>Error fetching player information.</p>";
             }
